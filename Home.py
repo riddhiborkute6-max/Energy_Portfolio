@@ -74,42 +74,48 @@ with col1:
     st.markdown("""
     <div style='background-color: #1E2130; padding: 20px; border-radius: 10px; margin-bottom: 12px;'>
     <h4>📊 Cannibalization Explorer</h4>
-    <p style='color: #aaa;'>How wind & solar erode their own market value as penetration grows. Interactive scatter by country and year.</p>
+    <p style='color: #aaa;'>How wind & solar erode their own market value as penetration grows.</p>
     </div>
     """, unsafe_allow_html=True)
-    
+    st.page_link("pages/1_Cannibalization_Explorer.py", label="Open →")
+
     st.markdown("""
     <div style='background-color: #1E2130; padding: 20px; border-radius: 10px; margin-bottom: 12px;'>
     <h4>⚙️ Flexibility Simulator</h4>
-    <p style='color: #aaa;'>Calculate your factory's arbitrage potential, peak shaving savings, and avoided grid charges.</p>
+    <p style='color: #aaa;'>Calculate your factory's arbitrage potential and grid charge savings.</p>
     </div>
     """, unsafe_allow_html=True)
-    
+    st.page_link("pages/3_Flexibility_Simulator.py", label="Open →")
+
     st.markdown("""
-    <div style='background-color: #1E2130; padding: 20px; border-radius: 10px;'>
+    <div style='background-color: #1E2130; padding: 20px; border-radius: 10px; margin-bottom: 12px;'>
     <h4>🔬 Thesis Lab</h4>
-    <p style='color: #aaa;'>Research question, methodology, dataset, and early findings. Updated as the thesis progresses.</p>
+    <p style='color: #aaa;'>Research question, methodology, dataset, and early findings.</p>
     </div>
     """, unsafe_allow_html=True)
+    st.page_link("pages/4_Thesis_Lab.py", label="Open →")
 
 with col2:
     st.markdown("""
     <div style='background-color: #1E2130; padding: 20px; border-radius: 10px; margin-bottom: 12px;'>
     <h4>🗓️ Negative Price Heatmap</h4>
-    <p style='color: #aaa;'>Calendar heatmap of negative price hours per country per year. When Germany pays you to consume.</p>
+    <p style='color: #aaa;'>Calendar heatmap of negative price hours per country per year.</p>
     </div>
     """, unsafe_allow_html=True)
-    
+    st.page_link("pages/2_Negative_Price_Heatmap.py", label="Open →")
+
     st.markdown("""
     <div style='background-color: #1E2130; padding: 20px; border-radius: 10px; margin-bottom: 12px;'>
     <h4>📝 Research Notes</h4>
-    <p style='color: #aaa;'>Weekly deep dives on European energy market mechanics — negative prices, cannibalization, flexibility.</p>
+    <p style='color: #aaa;'>Weekly deep dives on European energy market mechanics.</p>
     </div>
     """, unsafe_allow_html=True)
-    
+    st.page_link("pages/5_Research_Notes.py", label="Open →")
+
     st.markdown("""
-    <div style='background-color: #1E2130; padding: 20px; border-radius: 10px;'>
+    <div style='background-color: #1E2130; padding: 20px; border-radius: 10px; margin-bottom: 12px;'>
     <h4>👤 About</h4>
-    <p style='color: #aaa;'>Nagpur → John Deere → Berlin → European energy markets. The full story.</p>
+    <p style='color: #aaa;'>Nagpur → John Deere → Berlin → European energy markets.</p>
     </div>
     """, unsafe_allow_html=True)
+    st.page_link("pages/6_About.py", label="Open →")
