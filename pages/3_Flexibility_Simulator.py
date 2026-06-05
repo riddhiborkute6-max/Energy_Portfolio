@@ -223,10 +223,10 @@ with st.sidebar:
     sel_year = st.select_slider("Year", options=years, value=years[-1])
 
     st.markdown("### ⚙️ Asset Type")
-    asset = st.radio("", ["Battery storage", "Demand response"], label_visibility="collapsed")
+    asset = st.radio("Asset Type", ["Battery storage", "Demand response"], label_visibility="collapsed")
 
     st.markdown("### 🎯 Strategy")
-    strategy = st.radio("", ["Threshold dispatch", "Daily optimal arbitrage"],
+    strategy = st.radio("Strategy", ["Threshold dispatch", "Daily optimal arbitrage"],
                         label_visibility="collapsed")
 
     st.markdown("---")
