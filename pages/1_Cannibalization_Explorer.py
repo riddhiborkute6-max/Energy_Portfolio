@@ -134,6 +134,16 @@ def load_market(market_key: str) -> pd.DataFrame:
             else:
                 df.index = pd.to_datetime(df.index)
         df.index.name = "time"
+
+        # --- Clean the time index ----------------------------------------
+        # 1) Drop rows where the timestamp couldn't be parsed
+        df = df[df.index.notna()]
+        # 2) Sort chronologically
+        df = df.sort_index()
+        # 3) Remove duplicate timestamps (e.g. the Oct DST "fall back" hour
+        #    appears twice in ENTSO-E data). Keep the first occurrence.
+        df = df[~df.index.duplicated(keep="first")]
+
         # Keep first numeric column
         numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
         if not numeric_cols:
