@@ -97,9 +97,10 @@ transition actually plays out.
 <br><br>
 That shift is what drives my work. Engineering taught me how energy systems behave;
 economics is teaching me <strong>what they're worth</strong> and how markets price
-flexibility, risk, and renewable variability. My master's thesis sits right at that
-intersection - quantifying the value of industrial flexibility as renewables reshape
-European power prices.
+flexibility, risk, and renewable variability. My master's thesis (starting August 2026)
+will sit right at that intersection - quantifying the value of industrial flexibility as
+renewables reshape European power prices. This portfolio is the independent research I
+built ahead of it, to test and validate the approach on real data first.
 <br><br>
 <span style="color:#6e7681;">[EDIT: Add a personal sentence or two - why energy, what
 got you into it, what you care about. This is where your voice comes through.]</span>
@@ -127,7 +128,7 @@ with c1:
 with c2:
     st.markdown("""
     <div class="block">
-        <h4>🔬 Thesis Focus</h4>
+        <h4>🔬 Research Focus</h4>
         <ul>
             <li>Industrial flexibility value</li>
             <li>Renewable cannibalization effect</li>
@@ -170,7 +171,8 @@ st.markdown("""
     I'm seeking <strong style="color:#e6edf3;">analyst roles in energy markets</strong> -
     especially work on flexibility, storage, and renewable integration - where I can apply
     market modelling, Python, and data analysis to real transition problems. This portfolio is
-    my thesis work made interactive: real data, real methods, tools you can click through.
+    independent research I built ahead of my Master's thesis: real data, real methods, tools
+    you can click through.
     <br><br>
     If your team works on these questions, I'd genuinely like to talk - whether that's a role,
     a working-student position, or just a conversation about the work.
