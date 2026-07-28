@@ -81,7 +81,7 @@ with st.sidebar:
     st.markdown("""
     <div style='font-size:0.82rem; color:#8b949e; line-height:1.6;'>
     <strong style='color:#e6edf3;'>Riddhi Borkute</strong><br>
-    MSc Energy Economics · Berlin
+    MSc Global Production Engineering · TU Berlin
     </div>
     """, unsafe_allow_html=True)
 
@@ -90,7 +90,7 @@ st.title("👤 About")
 
 st.markdown("""
 <div class="bio">
-I'm <strong>Riddhi Borkute</strong>, an MSc Energy Economics student in Berlin with a
+I'm <strong>Riddhi Borkute</strong>, an MSc Global Production Engineering student at TU Berlin with a
 background in <strong>mechanical engineering</strong>. I moved from building and
 understanding physical systems to analysing the markets that will decide how the energy
 transition actually plays out.
@@ -116,10 +116,10 @@ with c1:
     <div class="block">
         <h4>🎓 Background</h4>
         <ul>
-            <li>MSc Energy Economics — Berlin</li>
-            <li>BEng Mechanical Engineering</li>
-            <li>Working student, energy sector</li>
-            <li>[EDIT: add any other highlight]</li>
+            <li>MSc Global Production Engineering — TU Berlin (GPA 1.3)</li>
+            <li>BE Mechanical Engineering — VNIT Nagpur</li>
+            <li>Working student, battery storage & flexibility — neustrom GmbH</li>
+            <li>3 years' prior engineering experience — John Deere</li>
         </ul>
     </div>
     """, unsafe_allow_html=True)
@@ -155,7 +155,8 @@ st.markdown('<div class="section-label">Tools & skills</div>', unsafe_allow_html
 
 skills = ["Python", "Pandas", "Plotly", "Streamlit", "Time-series analysis",
           "ENTSO-E data", "Electricity markets", "Energy modelling",
-          "Jupyter", "Git", "Data visualisation", "[EDIT: add more]"]
+          "Jupyter", "Git", "Data visualisation", "Excel & Apps Script",
+          "Power BI", "Tableau", "SQL", "MATLAB"]
 skills_html = "".join(f"<span class='skill-tag'>{s}</span>" for s in skills)
 st.markdown(f"<div>{skills_html}</div>", unsafe_allow_html=True)
 
@@ -183,10 +184,10 @@ st.markdown("""
 # contact links (st.link_button works on modern Streamlit; HTML fallback below)
 st.markdown("""
 <div class="contact-links">
-    <a href="[EDIT: LinkedIn URL]" target="_blank">🔗 LinkedIn</a>
-    <a href="[EDIT: GitHub URL]" target="_blank">💻 GitHub</a>
-    <a href="mailto:[EDIT: email]">✉️ Email</a>
-    <a href="[EDIT: CV/resume link]" target="_blank">📄 CV</a>
+    <a href="https://linkedin.com/in/riddhi-borkute" target="_blank">🔗 LinkedIn</a>
+    <a href="https://github.com/riddhiborkute6-max" target="_blank">💻 GitHub</a>
+    <a href="mailto:riddhiborkute6@gmail.com">✉️ Email</a>
+    <a href="[EDIT: host your CV as a PDF, e.g. in this repo, and link it here]" target="_blank">📄 CV</a>
 </div>
 """, unsafe_allow_html=True)
 
