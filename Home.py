@@ -110,7 +110,7 @@ with st.sidebar:
 # ── Hero ─────────────────────────────────────────────────────────────────────
 st.markdown("""
 <div class="hero">
-    <div class="eyebrow">Master's Thesis · Interactive Research Portfolio</div>
+    <div class="eyebrow">Independent Research · Ahead of My Master's Thesis (Aug 2026)</div>
     <h1>Quantifying the value of <span class="accent">industrial flexibility</span><br>
     under rising renewable penetration</h1>
     <p class="lede">
@@ -183,8 +183,9 @@ st.markdown("""
     Python, and data analysis to the energy transition — flexibility, storage, and renewable
     integration in particular.
     <br><br>
-    This portfolio is my thesis work made tangible: real market data, real methods, and tools
-    you can interact with rather than a PDF you have to read. If your team works on these
+    This portfolio is independent research I built ahead of my Master's thesis (starting
+    Aug 2026) on the same question: real market data, real methods, and tools you can
+    interact with rather than a PDF you have to read. If your team works on these
     problems, I'd love to talk.
     <br><br>
     <span style="color:#8b949e; font-size:0.9rem;">Currently working as a student analyst in
