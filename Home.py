@@ -93,7 +93,7 @@ with st.sidebar:
     st.markdown("""
     <div style='font-size:0.82rem; color:#8b949e; line-height:1.6;'>
     <strong style='color:#e6edf3;'>Riddhi Borkute</strong><br>
-    MSc Energy Economics · Berlin<br><br>
+    MSc Global Production Engineering · TU Berlin<br><br>
     Quantifying the value of industrial flexibility under rising renewable penetration.
     </div>
     """, unsafe_allow_html=True)
@@ -101,9 +101,9 @@ with st.sidebar:
     st.markdown("""
     <div style='font-size:0.78rem; color:#6e7681; line-height:1.7;'>
     📍 Berlin, Germany<br>
-    🔗 <a href='[EDIT: LinkedIn URL]' style='color:#58a6ff;'>LinkedIn</a><br>
-    💻 <a href='[EDIT: GitHub URL]' style='color:#58a6ff;'>GitHub</a><br>
-    ✉️ <a href='mailto:[EDIT: email]' style='color:#58a6ff;'>Email</a>
+    🔗 <a href='https://linkedin.com/in/riddhi-borkute' style='color:#58a6ff;' target='_blank'>LinkedIn</a><br>
+    💻 <a href='https://github.com/riddhiborkute6-max' style='color:#58a6ff;' target='_blank'>GitHub</a><br>
+    ✉️ <a href='mailto:riddhiborkute6@gmail.com' style='color:#58a6ff;'>Email</a>
     </div>
     """, unsafe_allow_html=True)
 
@@ -177,7 +177,7 @@ st.markdown("""
 <div class="pitch">
     <h3>What I'm working toward</h3>
     <p>
-    I'm an MSc Energy Economics student in Berlin with a background in mechanical
+    I'm an MSc Global Production Engineering student at TU Berlin with a background in mechanical
     engineering, moving into quantitative energy-market analysis. I'm looking for
     <strong style="color:#e6edf3;">analyst roles</strong> where I can apply market modelling,
     Python, and data analysis to the energy transition — flexibility, storage, and renewable
@@ -187,8 +187,11 @@ st.markdown("""
     you can interact with rather than a PDF you have to read. If your team works on these
     problems, I'd love to talk.
     <br><br>
-    <span style="color:#6e7681; font-size:0.85rem;">[EDIT: Add a sentence about your current
-    Werkstudent role / availability / target start date here.]</span>
+    <span style="color:#8b949e; font-size:0.9rem;">Currently working as a student analyst in
+    battery storage and grid-flexibility analytics at neustrom GmbH in Berlin, alongside my
+    Master's.
+    <span style="color:#6e7681; font-size:0.85rem;"> [EDIT: add your target start date /
+    availability here.]</span></span>
     </p>
 </div>
 """, unsafe_allow_html=True)
@@ -197,6 +200,6 @@ st.markdown("""
 st.markdown("""
 <div style='font-size:0.72rem; color:#484f58; font-family: IBM Plex Mono, monospace;
             text-align:center; padding-top:1.5rem; border-top:1px solid #21262d; margin-top:2rem;'>
-Built with Streamlit · Data from ENTSO-E Transparency Platform · © 2025 Riddhi Borkute
+Built with Streamlit · Data from ENTSO-E Transparency Platform · © 2026 Riddhi Borkute
 </div>
 """, unsafe_allow_html=True)
