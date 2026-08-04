@@ -24,32 +24,61 @@ from pathlib import Path
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Flexibility Simulator | Energy Portfolio",
-    page_icon="🔋",
     layout="wide",
 )
 
-# ── Custom CSS ──────────────────────────────────────────────────────────────────
+# ── Theme: same system as Home.py — charcoal + teal (structure) + amber (value) ─
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@300;400;600;700&display=swap');
-html, body, [class*="css"] { font-family: 'Sora', sans-serif; }
-.stApp { background-color: #0d1117; color: #e6edf3; }
-h1, h2, h3 { font-family: 'IBM Plex Mono', monospace !important; color: #58a6ff; }
-.concept-box {
-    background: #161b22; border-left: 3px solid #3fb950;
-    border-radius: 0 6px 6px 0; padding: 0.9rem 1.2rem; margin: 1rem 0;
-    font-size: 0.85rem; color: #8b949e; line-height: 1.6;
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap');
+
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+.stApp { background-color: #0c0c0d; color: #e9e7e2; }
+.block-container { max-width: 100% !important; padding-left: 3rem; padding-right: 3rem; }
+
+h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !important; font-weight: 600 !important; }
+
+.eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #2dd4bf;
+    margin-bottom: 0.6rem;
 }
-.concept-box strong { color: #e6edf3; }
-.concept-box code {
-    background: #0d1117; border: 1px solid #30363d; border-radius: 3px;
-    padding: 1px 5px; font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem; color: #56d364;
+.section-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #2dd4bf;
+    margin: 2.4rem 0 0.6rem 0;
 }
+.body-text {
+    color: #b7b4ac; font-size: 1.0rem; line-height: 1.8;
+    width: 100%; text-align: justify; text-justify: inter-word;
+}
+.body-text strong { color: #f2f0eb; }
+.body-text .accent { color: #f0a860; font-weight: 600; }
+
+.info-box {
+    background: #131314; border-left: 3px solid #2dd4bf;
+    border-radius: 0 8px 8px 0; padding: 1.1rem 1.4rem; margin: 1.2rem 0;
+    font-size: 0.92rem; color: #b7b4ac; line-height: 1.7;
+}
+.info-box strong { color: #f2f0eb; }
+.info-box code {
+    background: #0c0c0d; border: 1px solid #232324; border-radius: 4px;
+    padding: 1px 6px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem; color: #f0a860;
+}
+
 div[data-testid="stMetric"] {
-    background: #161b22; border: 1px solid #30363d;
-    border-radius: 8px; padding: 0.8rem 1rem;
+    background: #131314; border: 1px solid #232324; border-radius: 10px;
+    padding: 0.9rem 1.1rem;
 }
+div[data-testid="stMetricLabel"] {
+    font-family: 'IBM Plex Mono', monospace !important; color: #8f8c86 !important;
+}
+div[data-testid="stMetricValue"] {
+    font-family: 'IBM Plex Mono', monospace !important; color: #f0a860 !important;
+}
+
+hr { border-color: #232324; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -61,6 +90,10 @@ PRICE_FILES = {
     "Denmark West (DK1)": "prices_DK1.parquet",
     "Denmark East (DK2)": "prices_DK2.parquet",
 }
+
+# Portfolio scope everywhere is 2018–2024 — enforced here at load time so it
+# can't be bypassed by a stray year in the underlying parquet file.
+SCOPE_YEAR_MIN, SCOPE_YEAR_MAX = 2018, 2024
 
 
 @st.cache_data(show_spinner="Loading price data…")
@@ -87,6 +120,9 @@ def load_prices(market_key: str) -> pd.DataFrame:
     out = pd.DataFrame({"price": df[numeric_cols[0]].values}, index=df.index)
     out["year"] = out.index.year
     out["date"] = out.index.date
+
+    # Keep only 2018–2024, matching the rest of the portfolio
+    out = out[(out["year"] >= SCOPE_YEAR_MIN) & (out["year"] <= SCOPE_YEAR_MAX)]
     return out
 
 
@@ -130,22 +166,20 @@ def simulate_battery_arbitrage(df_day_prices, capacity_mwh, power_mw, eff):
     Approximation suitable for a portfolio-grade simulator (not an LP solver).
     """
     cash_total = np.zeros(len(df_day_prices))
-    # number of hours of charging/discharging capacity available per day
     n_slots = int(np.ceil(capacity_mwh / power_mw))
 
-    # group indices by day
     idx = np.arange(len(df_day_prices))
     for _, grp in pd.DataFrame({"price": df_day_prices, "i": idx}).groupby(
             df_day_prices.index.date):
         p = grp["price"].values
         ii = grp["i"].values
-        order = np.argsort(p)                 # cheapest first
-        cheap = order[:n_slots]               # charge hours
-        expensive = order[::-1][:n_slots]     # discharge hours
+        order = np.argsort(p)
+        cheap = order[:n_slots]
+        expensive = order[::-1][:n_slots]
         energy_per_slot = min(power_mw, capacity_mwh / n_slots)
         for cj, dj in zip(cheap, expensive):
             buy_p, sell_p = p[cj], p[dj]
-            if sell_p * eff > buy_p:           # profitable spread only
+            if sell_p * eff > buy_p:
                 cash_total[ii[cj]] += -buy_p * energy_per_slot
                 cash_total[ii[dj]] += sell_p * energy_per_slot * eff
     return cash_total
@@ -161,13 +195,12 @@ def simulate_dr_threshold(prices, baseline_mw, curtail_below_pct, shift_above):
     """
     n = len(prices)
     savings = np.zeros(n)
-    action = np.zeros(n)  # -1 = curtailed
-    # threshold: curtail the most expensive X% of hours
+    action = np.zeros(n)
     thresh = np.percentile(prices, 100 - curtail_below_pct)
     thresh = max(thresh, shift_above)
     for i, p in enumerate(prices):
         if p > thresh:
-            savings[i] = baseline_mw * p   # avoided buying at high price
+            savings[i] = baseline_mw * p
             action[i] = -1
     return savings, action
 
@@ -190,48 +223,63 @@ def simulate_dr_arbitrage(df_prices, baseline_mw, flex_hours_per_day):
         order = np.argsort(p)
         cheap = order[:k]
         expensive = order[::-1][:k]
-        # saving = moving baseline_mw of load from expensive to cheap hours
         saving = baseline_mw * (p[expensive].sum() - p[cheap].sum())
-        # attribute to the expensive hours that were avoided
         for ej in expensive:
             savings[ii[ej]] += baseline_mw * (p[ej] - p[cheap].mean())
     return savings
 
 
 # ── Header ───────────────────────────────────────────────────────────────────
-st.title("🔋 Flexibility Simulator")
+st.markdown('<div class="eyebrow">Independent Research · Tool 3 of 4</div>', unsafe_allow_html=True)
+st.title("Flexibility Simulator")
+
 st.markdown("""
-<div class="concept-box">
-<strong>From price data to euros.</strong>
-A flexible asset earns money from <em>price spread</em> — buying (or avoiding) power when
-it's cheap and selling (or shifting to) when it's expensive. As renewables deepen
-volatility, that spread widens. This simulator quantifies the annual value for two asset
-classes under two dispatch strategies. Adjust the parameters and watch the revenue update.
-<br><br>
-<code>Battery</code> = arbitrage on the price spread, limited by capacity & efficiency.
-<code>Demand response</code> = savings from shifting industrial load away from peak prices.
+<div class="body-text">
+The previous two tools show <em>why</em> price volatility exists — solar and wind cannibalizing
+their own value, oversupply pushing prices negative. This tool turns that volatility directly
+into euros: how much can a flexible asset actually earn by responding to it? Pick an asset,
+pick a strategy, and the simulation runs against real historical hourly prices.
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="info-box">
+<strong>How the two asset types earn money.</strong><br>
+<code>Battery storage</code> — buys (charges) power when it's cheap and sells (discharges) it
+when it's expensive, earning the price spread minus round-trip losses.<br>
+<code>Demand response</code> — doesn't store anything; it just avoids buying power during
+expensive hours, or shifts consumption from expensive hours to cheap ones. The "revenue" here
+is really <em>savings</em> versus a business that always runs on a flat schedule.<br><br>
+Both strategy options do the same underlying thing at different levels of sophistication:
+<strong>Threshold dispatch</strong> reacts to fixed price levels you set (simple, realistic for
+an actual control system). <strong>Daily optimal arbitrage</strong> assumes perfect foresight
+within each day and picks the best possible hours (an upper-bound estimate, not what a
+real system would achieve).
 </div>
 """, unsafe_allow_html=True)
 
 # ── Sidebar ─────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 🗺️ Market & Year")
+    st.markdown('<div class="section-label">Market & Year</div>', unsafe_allow_html=True)
     market = st.selectbox("Market", list(PRICE_FILES.keys()), index=0)
 
     df_all = load_prices(market)
     years = sorted(df_all["year"].unique())
+    if not years:
+        st.error(f"No data in the 2018–2024 range was found for {market}.")
+        st.stop()
     sel_year = st.select_slider("Year", options=years, value=years[-1])
 
-    st.markdown("### ⚙️ Asset Type")
+    st.markdown('<div class="section-label">Asset Type</div>', unsafe_allow_html=True)
     asset = st.radio("Asset Type", ["Battery storage", "Demand response"], label_visibility="collapsed")
 
-    st.markdown("### 🎯 Strategy")
+    st.markdown('<div class="section-label">Strategy</div>', unsafe_allow_html=True)
     strategy = st.radio("Strategy", ["Threshold dispatch", "Daily optimal arbitrage"],
                         label_visibility="collapsed")
 
     st.markdown("---")
     if asset == "Battery storage":
-        st.markdown("### 🔋 Battery Parameters")
+        st.markdown('<div class="section-label">Battery Parameters</div>', unsafe_allow_html=True)
         capacity = st.slider("Capacity (MWh)", 1, 100, 10)
         power    = st.slider("Power rating (MW)", 1, 50, 5)
         eff      = st.slider("Round-trip efficiency (%)", 50, 100, 90) / 100
@@ -239,7 +287,7 @@ with st.sidebar:
             charge_below    = st.slider("Charge when price below (€/MWh)", -50, 100, 20)
             discharge_above = st.slider("Discharge when price above (€/MWh)", 0, 300, 80)
     else:
-        st.markdown("### 🏭 Demand Response Parameters")
+        st.markdown('<div class="section-label">Demand Response Parameters</div>', unsafe_allow_html=True)
         baseline = st.slider("Flexible load (MW)", 1, 50, 5)
         if strategy == "Threshold dispatch":
             curtail_pct = st.slider("Curtail top % of hours", 1, 30, 10)
@@ -280,8 +328,7 @@ total_value = df["cashflow"].sum()
 active_hours = int((df["action"] != 0).sum())
 
 # ── Headline metrics ─────────────────────────────────────────────────────────────
-st.markdown("---")
-st.subheader(f"📊 {sel_year} Results — {market}")
+st.markdown(f'<div class="section-label">{sel_year} Results — {market}</div>', unsafe_allow_html=True)
 
 m1, m2, m3, m4 = st.columns(4)
 m1.metric(f"Annual {unit.lower()}", f"€{total_value:,.0f}")
@@ -297,9 +344,26 @@ price_spread = prices.quantile(0.9) - prices.quantile(0.1)
 m4.metric("Price spread (P90–P10)", f"€{price_spread:,.0f}/MWh",
           help="Wider spread = more flexibility value available")
 
+st.markdown("""
+<div class="info-box" style="font-size:0.85rem;">
+<strong>What these four numbers mean together:</strong> the total euro figure is the headline,
+but <em>active hours</em> tells you how often the asset actually had to act to earn it — fewer
+hours for the same money means a more efficient strategy. The per-MWh / per-MW figures let you
+compare markets or years on equal footing regardless of how big the asset is. The price spread
+is the underlying opportunity: if it's small, no strategy will earn much, no matter how it's
+tuned.
+</div>
+""", unsafe_allow_html=True)
+
 # ── Chart 1: cumulative value over the year ────────────────────────────────────
-st.markdown("---")
-st.subheader(f"💶 Cumulative {unit} Through the Year")
+st.markdown(f'<div class="section-label">Cumulative {unit} Through the Year</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="body-text" style="font-size:0.92rem;">
+Running total of euros earned or saved, hour by hour across the year. The steepness of the
+climb shows when the asset was doing the most work — flat stretches mean the price spread that
+day wasn't wide enough to act on.
+</div>
+""", unsafe_allow_html=True)
 
 df_sorted = df.sort_index()
 df_sorted["cumulative"] = df_sorted["cashflow"].cumsum()
@@ -307,64 +371,73 @@ df_sorted["cumulative"] = df_sorted["cashflow"].cumsum()
 fig1 = go.Figure()
 fig1.add_trace(go.Scatter(
     x=df_sorted.index, y=df_sorted["cumulative"],
-    mode="lines", line=dict(color="#3fb950", width=2),
-    fill="tozeroy", fillcolor="rgba(63,185,80,0.1)",
+    mode="lines", line=dict(color="#f0a860", width=2),
+    fill="tozeroy", fillcolor="rgba(240,168,96,0.12)",
     hovertemplate="%{x|%b %d}<br>Cumulative: €%{y:,.0f}<extra></extra>",
 ))
 fig1.update_layout(
     template="plotly_dark",
-    paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
-    font=dict(family="IBM Plex Mono, monospace", color="#8b949e"),
-    xaxis=dict(title="Date", gridcolor="#21262d"),
-    yaxis=dict(title=f"Cumulative {unit} (€)", gridcolor="#21262d"),
+    paper_bgcolor="#131314", plot_bgcolor="#131314",
+    font=dict(family="'IBM Plex Mono', monospace", color="#8f8c86"),
+    xaxis=dict(title="Date", gridcolor="#232324"),
+    yaxis=dict(title=f"Cumulative {unit} (€)", gridcolor="#232324"),
     margin=dict(l=70, r=20, t=20, b=50), height=380,
 )
 st.plotly_chart(fig1, use_container_width=True)
 
 # ── Chart 2: a representative dispatch week ─────────────────────────────────────
-st.markdown("---")
-st.subheader("🔍 Dispatch Detail — Sample Week")
-st.caption("A representative week showing how the asset responds to price signals")
+st.markdown('<div class="section-label">Dispatch Detail — Sample Week</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="body-text" style="font-size:0.92rem;">
+The single busiest week of the year for this asset and strategy, zoomed in hour by hour. The
+teal line is the market price; the markers show exactly when the asset chose to act —
+<span class="accent">amber triangles</span> mark charging/consuming during cheap hours, and
+the downward markers mark discharging/curtailing during expensive ones.
+</div>
+""", unsafe_allow_html=True)
 
-# pick the week with the highest activity
 df_sorted["week"] = df_sorted.index.isocalendar().week
 week_activity = df_sorted.groupby("week")["cashflow"].apply(lambda s: s.abs().sum())
 best_week = week_activity.idxmax()
 wk = df_sorted[df_sorted["week"] == best_week]
 
 fig2 = go.Figure()
-# price line
 fig2.add_trace(go.Scatter(
     x=wk.index, y=wk["price"], name="Price (€/MWh)",
-    line=dict(color="#58a6ff", width=1.8), yaxis="y",
+    line=dict(color="#2dd4bf", width=1.8), yaxis="y",
 ))
-# charge / discharge markers
 charge = wk[wk["action"] > 0]
 discharge = wk[wk["action"] < 0]
 fig2.add_trace(go.Scatter(
     x=charge.index, y=charge["price"], mode="markers", name="Charge / consume",
-    marker=dict(color="#3fb950", size=8, symbol="triangle-down"),
+    marker=dict(color="#f0a860", size=8, symbol="triangle-down"),
 ))
 fig2.add_trace(go.Scatter(
     x=discharge.index, y=discharge["price"], mode="markers", name="Discharge / curtail",
-    marker=dict(color="#ff6b6b", size=8, symbol="triangle-up"),
+    marker=dict(color="#e05c5c", size=8, symbol="triangle-up"),
 ))
 fig2.update_layout(
     template="plotly_dark",
-    paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
-    font=dict(family="IBM Plex Mono, monospace", color="#8b949e"),
-    xaxis=dict(title="", gridcolor="#21262d"),
-    yaxis=dict(title="Price (€/MWh)", gridcolor="#21262d"),
-    legend=dict(bgcolor="#161b22", bordercolor="#30363d", borderwidth=1,
+    paper_bgcolor="#131314", plot_bgcolor="#131314",
+    font=dict(family="'IBM Plex Mono', monospace", color="#8f8c86"),
+    xaxis=dict(title="", gridcolor="#232324"),
+    yaxis=dict(title="Price (€/MWh)", gridcolor="#232324"),
+    legend=dict(bgcolor="#131314", bordercolor="#232324", borderwidth=1,
                 orientation="h", y=1.12),
     margin=dict(l=60, r=20, t=40, b=40), height=380,
 )
 st.plotly_chart(fig2, use_container_width=True)
 
 # ── Chart 3: value across ALL years (the thesis money-shot) ────────────────────
-st.markdown("---")
-st.subheader("📈 Flexibility Value Over Time — All Years")
-st.caption("Re-runs the current asset & strategy for every year. Rising value = the thesis argument in euros.")
+st.markdown('<div class="section-label">Flexibility Value Over Time — All Years</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="body-text" style="font-size:0.92rem;">
+Re-runs the current asset and strategy, unchanged, against every year of data (2018–2024).
+This is the central argument of the whole portfolio made concrete: if this bar chart trends
+upward, it means the same fixed asset earns more money every year — not because the asset
+changed, but because rising renewable penetration is widening the price spread it profits from.
+</div>
+""", unsafe_allow_html=True)
 
 @st.cache_data(show_spinner="Simulating all years…")
 def value_by_year(market_key, asset_type, strat, params):
@@ -390,7 +463,6 @@ def value_by_year(market_key, asset_type, strat, params):
         results[yr] = float(np.sum(c))
     return results
 
-# assemble params for caching
 if asset == "Battery storage":
     params = dict(capacity=capacity, power=power, eff=eff,
                   charge_below=charge_below if strategy == "Threshold dispatch" else 0,
@@ -406,15 +478,15 @@ yr_df = pd.DataFrame({"year": list(yearly.keys()), "value": list(yearly.values()
 
 fig3 = go.Figure(go.Bar(
     x=yr_df["year"], y=yr_df["value"],
-    marker_color="#3fb950", opacity=0.85,
+    marker_color="#f0a860", opacity=0.85,
     hovertemplate="Year: %{x}<br>" + unit + ": €%{y:,.0f}<extra></extra>",
 ))
 fig3.update_layout(
     template="plotly_dark",
-    paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
-    font=dict(family="IBM Plex Mono, monospace", color="#8b949e"),
-    xaxis=dict(title="Year", dtick=1, gridcolor="#21262d"),
-    yaxis=dict(title=f"Annual {unit} (€)", gridcolor="#21262d"),
+    paper_bgcolor="#131314", plot_bgcolor="#131314",
+    font=dict(family="'IBM Plex Mono', monospace", color="#8f8c86"),
+    xaxis=dict(title="Year", dtick=1, gridcolor="#232324"),
+    yaxis=dict(title=f"Annual {unit} (€)", gridcolor="#232324"),
     margin=dict(l=70, r=20, t=20, b=50), height=360,
 )
 st.plotly_chart(fig3, use_container_width=True)
@@ -422,7 +494,7 @@ st.plotly_chart(fig3, use_container_width=True)
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("---")
 st.markdown("""
-<div style='font-size:0.72rem; color:#484f58; font-family: IBM Plex Mono, monospace; text-align:center;'>
+<div style='font-size:0.75rem; color:#4a4a48; font-family: "IBM Plex Mono", monospace; text-align:center;'>
 Simplified dispatch model for illustration — battery arbitrage uses a greedy daily heuristic,
 not a full optimisation. Revenue is gross of capital, degradation, grid fees & taxes.
 Source: ENTSO-E Transparency Platform day-ahead prices (2018–2024).
