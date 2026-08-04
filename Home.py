@@ -62,7 +62,7 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
     font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #a7a49d;
 }
 
-/* Cards — now IS the st.page_link element, so the whole box is clickable */
+/* Cards — the whole box is clickable */
 [data-testid="stPageLink"] {
     display: flex !important; flex-direction: column; align-items: flex-start;
     justify-content: flex-start;
@@ -71,7 +71,7 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
     transition: border-color 0.2s ease, transform 0.2s ease;
     text-decoration: none !important;
 }
-[data-testid="stPageLink"]:hover { border-color: #2dd4bf; transform: translateY(-2px); }
+[data-testid="stPageLink"]:hover { border-color: #f0a860; transform: translateY(-2px); }
 [data-testid="stPageLink"] p {
     font-family: 'Inter', sans-serif !important; color: #8f8c86 !important;
     font-size: 0.9rem !important; line-height: 1.6 !important;
