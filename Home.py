@@ -2,13 +2,6 @@
 Home.py
 --------
 Landing page — Riddhi Borkute's Energy Portfolio
-
-Balanced framing: leads with the project (thesis-driven flexibility analysis),
-then a career pitch underneath. Static content — placeholders marked [EDIT]
-are yours to fill in. Navigation cards link to the interactive pages.
-
-This is the repo entry point. If your main file is named app.py or
-streamlit_app.py instead, rename this to match.
 """
 
 import streamlit as st
@@ -16,7 +9,6 @@ import streamlit as st
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Riddhi Borkute | Energy Portfolio",
-    page_icon="⚡",
     layout="wide",
     initial_sidebar_state="expanded",
 )
@@ -89,12 +81,11 @@ h1, h2, h3 { font-family: 'IBM Plex Mono', monospace !important; color: #58a6ff;
 
 # ── Sidebar ─────────────────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### ⚡ Energy Portfolio")
+    st.markdown("### Energy Portfolio")
     st.markdown("""
     <div style='font-size:0.82rem; color:#8b949e; line-height:1.6;'>
     <strong style='color:#e6edf3;'>Riddhi Borkute</strong><br>
     MSc Global Production Engineering · TU Berlin<br><br>
-    Quantifying the value of industrial flexibility under rising renewable penetration.
     </div>
     """, unsafe_allow_html=True)
     st.markdown("---")
@@ -111,13 +102,12 @@ with st.sidebar:
 st.markdown("""
 <div class="hero">
     <div class="eyebrow">Independent Research · Ahead of My Master's Thesis (Aug 2026)</div>
-    <h1>Quantifying the value of <span class="accent">industrial flexibility</span><br>
-    under rising renewable penetration</h1>
+    <h1>About</h1>
     <p class="lede">
-    As wind and solar grow, they depress electricity prices exactly when they generate most —
+    As wind and solar grow, they depress electricity prices exactly when they generate most which is called
     the <strong style="color:#e6edf3;">cannibalization effect</strong>. This erosion creates a
-    widening price spread that flexible industrial assets — batteries, demand response — can
-    capture. This portfolio turns seven years of ENTSO-E market data across Germany, the
+    widening price spread that flexible industrial assets like batteries and demand response can
+    capture. This portfolio turns seven years (2018 to 2024) of ENTSO-E market data across Germany, the
     Netherlands and Denmark into interactive tools that measure exactly how much that
     flexibility is worth.
     </p>
@@ -138,64 +128,61 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
+# ── Background / who I am (formerly the separate "About" page) ───────────────
+st.markdown("""
+<div class="pitch">
+    <h3>Who I am</h3>
+    <p>
+    I'm an MSc Global Production Engineering student at TU Berlin, moving from a
+    mechanical engineering background into quantitative energy-market analysis. I currently
+    work as a <strong style="color:#e6edf3;">Working Student in Energy Market and Asset Optimization
+    at neustrom GmbH</strong> in Berlin, where I size and configure battery storage
+    systems for industrial and commercial clients, build dispatch strategies for storage
+    co-located with solar and wind, and develop Python-based market models on day-ahead price
+    and generation data, translating that analysis into client-facing decision tools.
+    <br><br>
+    Before moving into energy, I spent two years as an engineer at John Deere in Pune, India,
+    running Value Engineering workshops and building Power BI / Tableau reporting that
+    standardised cost and performance tracking across plants in India, Europe and the US.
+    <br><br>
+    This portfolio is independent research I'm building ahead of my Master's thesis (starting
+    August 2026), on the same underlying question: how much is industrial flexibility worth as
+    renewable penetration rises. It's built on real ENTSO-E market data with real methods, and
+    designed as tools you can interact with rather than a PDF you have to read.
+    <br><br>
+    <span style="color:#8b949e; font-size:0.9rem;">
+    </span>
+    </p>
+</div>
+""", unsafe_allow_html=True)
+
 # ── Navigation cards ─────────────────────────────────────────────────────────
 st.markdown('<div class="section-label">Explore the analysis</div>', unsafe_allow_html=True)
 
 cards = [
-    ("📉", "Cannibalization Explorer",
+    ("Cannibalization Explorer",
      "How renewable penetration erodes the capture price of wind and solar, year by year, across three markets."),
-    ("🔴", "Negative Price Heatmap",
+    ("Negative Price Heatmap",
      "When prices fall below zero — mapped across hour-of-day and month, revealing the rhythm of over-supply."),
-    ("🔋", "Flexibility Simulator",
+    ("Flexibility Simulator",
      "Turn price volatility into euros: simulate battery storage and demand-response revenue under two strategies."),
-    ("🧪", "Thesis Lab",
-     "The research question, methodology, and core literature underpinning this work."),
-    ("📓", "Research Notes",
-     "Working notes on key papers, data sources, and analytical decisions."),
-    ("👤", "About",
-     "Background, what I'm working toward, and how to get in touch."),
+    ("Price Duration Curves",
+     "Hourly prices sorted from highest to lowest, showing how much of the year sits in the extreme tails a flexible asset can arbitrage."),
 ]
 
-# render in rows of 3
-for row_start in range(0, len(cards), 3):
-    cols = st.columns(3)
-    for col, (icon, title, desc) in zip(cols, cards[row_start:row_start + 3]):
-        with col:
-            st.markdown(f"""
-            <div class="card">
-                <div class="icon">{icon}</div>
-                <div class="title">{title}</div>
-                <div class="desc">{desc}</div>
-            </div>
-            """, unsafe_allow_html=True)
-    st.markdown("<div style='height:0.8rem;'></div>", unsafe_allow_html=True)
+cols = st.columns(4)
+for col, (icon, title, desc) in zip(cols, cards):
+    with col:
+        st.markdown(f"""
+        <div class="card">
+            <div class="icon">{icon}</div>
+            <div class="title">{title}</div>
+            <div class="desc">{desc}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
+st.markdown("<div style='height:0.8rem;'></div>", unsafe_allow_html=True)
 st.caption("Use the sidebar to navigate between pages.")
-
-# ── Pitch band (career, underneath the project) ────────────────────────────────
-st.markdown("""
-<div class="pitch">
-    <h3>What I'm working toward</h3>
-    <p>
-    I'm an MSc Global Production Engineering student at TU Berlin with a background in mechanical
-    engineering, moving into quantitative energy-market analysis. I'm looking for
-    <strong style="color:#e6edf3;">analyst roles</strong> where I can apply market modelling,
-    Python, and data analysis to the energy transition — flexibility, storage, and renewable
-    integration in particular.
-    <br><br>
-    This portfolio is independent research I built ahead of my Master's thesis (starting
-    Aug 2026) on the same question: real market data, real methods, and tools you can
-    interact with rather than a PDF you have to read. If your team works on these
-    problems, I'd love to talk.
-    <br><br>
-    <span style="color:#8b949e; font-size:0.9rem;">Currently working as a student analyst in
-    battery storage and grid-flexibility analytics at neustrom GmbH in Berlin, alongside my
-    Master's.
-    <span style="color:#6e7681; font-size:0.85rem;"> [EDIT: add your target start date /
-    availability here.]</span></span>
-    </p>
-</div>
-""", unsafe_allow_html=True)
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("""
