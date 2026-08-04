@@ -477,7 +477,7 @@ yearly = value_by_year(market, asset, strategy, params)
 yr_df = pd.DataFrame({"year": list(yearly.keys()), "value": list(yearly.values())})
 
 fig3 = go.Figure(go.Bar(
-    x=yr_df["year"], y=yr_df["value"],
+    x=yr_df["year"].astype(str), y=yr_df["value"],
     marker_color="#f0a860", opacity=0.85,
     hovertemplate="Year: %{x}<br>" + unit + ": €%{y:,.0f}<extra></extra>",
 ))
@@ -485,7 +485,7 @@ fig3.update_layout(
     template="plotly_dark",
     paper_bgcolor="#131314", plot_bgcolor="#131314",
     font=dict(family="'IBM Plex Mono', monospace", color="#8f8c86"),
-    xaxis=dict(title="Year", dtick=1, gridcolor="#232324"),
+    xaxis=dict(title="Year", gridcolor="#232324"),
     yaxis=dict(title=f"Annual {unit} (€)", gridcolor="#232324"),
     margin=dict(l=70, r=20, t=20, b=50), height=360,
 )
