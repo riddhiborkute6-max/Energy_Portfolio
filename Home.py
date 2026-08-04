@@ -31,15 +31,20 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
 .hero .eyebrow {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
-    color: #2f8f86; margin-bottom: 0.6rem;
+    color: #2dd4bf; margin-bottom: 0.6rem;
 }
 .hero h1 { font-size: 2.6rem !important; line-height: 1.15; margin: 0 0 0.9rem 0; }
 
-/* Section labels */
+/* Section labels + matching sub-headings (same pattern as the hero) */
 .section-label {
-    font-family: 'IBM Plex Mono', monospace; font-size: 0.76rem;
-    letter-spacing: 0.1em; text-transform: uppercase; color: #6f6d68;
-    margin: 2.4rem 0 1rem 0; border-left: 2px solid #2f8f86; padding-left: 0.6rem;
+    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #2dd4bf;
+    margin: 2.6rem 0 0.6rem 0;
+}
+.section-heading {
+    font-family: 'Fraunces', serif !important; color: #f2f0eb !important;
+    font-weight: 600 !important; font-size: 1.9rem !important;
+    margin: 0 0 1rem 0 !important;
 }
 
 /* Body copy — full width, justified */
@@ -66,11 +71,16 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
     transition: border-color 0.2s ease, transform 0.2s ease;
     text-decoration: none !important;
 }
-[data-testid="stPageLink"]:hover { border-color: #2f8f86; transform: translateY(-2px); }
+[data-testid="stPageLink"]:hover { border-color: #2dd4bf; transform: translateY(-2px); }
 [data-testid="stPageLink"] p {
-    font-family: 'Fraunces', serif !important; color: #f2f0eb !important;
-    font-size: 1.05rem !important; line-height: 1.5 !important;
+    font-family: 'Inter', sans-serif !important; color: #8f8c86 !important;
+    font-size: 0.9rem !important; line-height: 1.6 !important;
     text-align: left !important; white-space: pre-line !important;
+}
+[data-testid="stPageLink"] p strong {
+    font-family: 'Fraunces', serif !important; color: #2dd4bf !important;
+    font-size: 1.15rem !important; font-weight: 600 !important;
+    display: block; margin-bottom: 0.5rem;
 }
 
 hr { border-color: #232324; }
@@ -90,9 +100,9 @@ with st.sidebar:
     st.markdown("""
     <div style='font-size:0.78rem; color:#8f8c86; line-height:1.8;'>
     📍 Berlin, Germany<br>
-    🔗 <a href='https://linkedin.com/in/riddhi-borkute' style='color:#2f8f86;' target='_blank'>LinkedIn</a><br>
-    💻 <a href='https://github.com/riddhiborkute6-max' style='color:#2f8f86;' target='_blank'>GitHub</a><br>
-    ✉️ <a href='mailto:riddhiborkute6@gmail.com' style='color:#2f8f86;'>Email</a>
+    🔗 <a href='https://linkedin.com/in/riddhi-borkute' style='color:#2dd4bf;' target='_blank'>LinkedIn</a><br>
+    💻 <a href='https://github.com/riddhiborkute6-max' style='color:#2dd4bf;' target='_blank'>GitHub</a><br>
+    ✉️ <a href='mailto:riddhiborkute6@gmail.com' style='color:#2dd4bf;'>Email</a>
     </div>
     """, unsafe_allow_html=True)
 
@@ -119,14 +129,13 @@ Before moving into energy, I spent two years as an engineer at John Deere in Pun
 running Value Engineering workshops and building Power BI / Tableau reporting that standardised
 cost and performance tracking across plants in India, Europe and the US.
 <br><br>
-<span style="color:#8f8c86; font-size:0.9rem;">
-Available from November 2026 &nbsp;·&nbsp; English (C1), German (A2), Hindi (C1)
 </span>
 </div>
 """, unsafe_allow_html=True)
 
 # ── The Research ──────────────────────────────────────────────────────────────
 st.markdown('<div class="section-label">The Research</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-heading">Quantifying the Cannibalization Effect</h2>', unsafe_allow_html=True)
 st.markdown("""
 <div class="body-text">
 As wind and solar grow, they depress electricity prices exactly when they generate most — the
@@ -138,21 +147,9 @@ research built ahead of my Master's thesis, starting August 2026.
 </div>
 """, unsafe_allow_html=True)
 
-st.markdown("""
-<div style="margin-top:1rem;">
-    <span class="tag">ENTSO-E data</span>
-    <span class="tag">2018–2024</span>
-    <span class="tag">DE · NL · DK</span>
-    <span class="tag">Python</span>
-    <span class="tag">Pandas</span>
-    <span class="tag">Plotly</span>
-    <span class="tag">Streamlit</span>
-    <span class="tag">Hourly day-ahead prices</span>
-</div>
-""", unsafe_allow_html=True)
-
 # ── Navigation cards ─────────────────────────────────────────────────────────
 st.markdown('<div class="section-label">Explore the Analysis</div>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-heading">Four Ways Into the Data</h2>', unsafe_allow_html=True)
 
 # Real filenames confirmed from the repo. If any of these change, update the
 # path string (not the label) so the link keeps working.
