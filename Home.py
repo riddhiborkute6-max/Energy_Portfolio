@@ -100,8 +100,7 @@ with st.sidebar:
 
 # ── Hero ─────────────────────────────────────────────────────────────────────
 st.markdown("""
-<div class="hero">
-    <div class="eyebrow">Independent Research · Ahead of My Master's Thesis (Aug 2026)</div>
+<div class="hero">S
     <h1>About</h1>
     <p class="lede">
     As wind and solar grow, they depress electricity prices exactly when they generate most which is called
