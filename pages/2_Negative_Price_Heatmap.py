@@ -21,41 +21,64 @@ from pathlib import Path
 # ── Page config ───────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Negative Price Heatmap | Energy Portfolio",
-    page_icon="🔴",
     layout="wide",
 )
 
-# ── Custom CSS (matches Cannibalization Explorer) ──────────────────────────────
+# ── Theme: same system as Home.py — charcoal + teal (structure) + amber (value) ─
 st.markdown("""
 <style>
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;600&family=Sora:wght@300;400;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;600&display=swap');
 
-html, body, [class*="css"] { font-family: 'Sora', sans-serif; }
-.stApp { background-color: #0d1117; color: #e6edf3; }
-h1, h2, h3 { font-family: 'IBM Plex Mono', monospace !important; color: #58a6ff; }
+html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
+.stApp { background-color: #0c0c0d; color: #e9e7e2; }
+.block-container { max-width: 100% !important; padding-left: 3rem; padding-right: 3rem; }
 
-.concept-box {
-    background: #161b22;
-    border-left: 3px solid #ff6b6b;
-    border-radius: 0 6px 6px 0;
-    padding: 0.9rem 1.2rem;
-    margin: 1rem 0;
-    font-size: 0.85rem;
-    color: #8b949e;
-    line-height: 1.6;
+h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !important; font-weight: 600 !important; }
+
+.eyebrow {
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #2dd4bf;
+    margin-bottom: 0.6rem;
 }
-.concept-box strong { color: #e6edf3; }
-.concept-box code {
-    background: #0d1117; border: 1px solid #30363d; border-radius: 3px;
-    padding: 1px 5px; font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.8rem; color: #ff7b72;
+.section-label {
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
+    letter-spacing: 0.12em; text-transform: uppercase; color: #2dd4bf;
+    margin: 2.4rem 0 0.6rem 0;
+}
+.body-text {
+    color: #b7b4ac; font-size: 1.0rem; line-height: 1.8;
+    width: 100%; text-align: justify; text-justify: inter-word;
+}
+.body-text strong { color: #f2f0eb; }
+.body-text .accent { color: #f0a860; font-weight: 600; }
+
+/* Explanation boxes — red left border here specifically, since this page's
+   subject (negative prices) is itself a "warning" signal */
+.info-box {
+    background: #131314; border-left: 3px solid #e05c5c;
+    border-radius: 0 8px 8px 0; padding: 1.1rem 1.4rem; margin: 1.2rem 0;
+    font-size: 0.92rem; color: #b7b4ac; line-height: 1.7;
+}
+.info-box strong { color: #f2f0eb; }
+.info-box code {
+    background: #0c0c0d; border: 1px solid #232324; border-radius: 4px;
+    padding: 1px 6px; font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem; color: #f0a860;
 }
 
 div[data-testid="stMetric"] {
-    background: #161b22; border: 1px solid #30363d;
-    border-radius: 8px; padding: 0.8rem 1rem;
+    background: #131314; border: 1px solid #232324; border-radius: 10px;
+    padding: 0.9rem 1.1rem;
 }
+div[data-testid="stMetricLabel"] {
+    font-family: 'IBM Plex Mono', monospace !important; color: #8f8c86 !important;
+}
+div[data-testid="stMetricValue"] {
+    font-family: 'IBM Plex Mono', monospace !important; color: #f0a860 !important;
+}
+
 .stSelectbox > div, .stRadio > div { background: transparent !important; }
+hr { border-color: #232324; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -72,6 +95,11 @@ PRICE_FILES = {
 MONTH_LABELS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
                 "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
+# Portfolio scope everywhere else is 2018–2024. Cap here too, in case a
+# data file has extra rows (e.g. a partial 2025) that would otherwise
+# silently sneak into the year list.
+SCOPE_YEAR_MIN, SCOPE_YEAR_MAX = 2018, 2024
+
 
 @st.cache_data(show_spinner="Loading price data…")
 def load_prices(market_key: str) -> pd.DataFrame:
@@ -83,7 +111,6 @@ def load_prices(market_key: str) -> pd.DataFrame:
 
     df = pd.read_parquet(path)
 
-    # Normalise the time index
     if not isinstance(df.index, pd.DatetimeIndex):
         time_col = next((c for c in df.columns
                          if c.lower() in ("time", "datetime", "timestamp", "date")), None)
@@ -93,11 +120,9 @@ def load_prices(market_key: str) -> pd.DataFrame:
             df.index = pd.to_datetime(df.index)
     df.index.name = "time"
 
-    # Clean: drop bad timestamps, sort, remove duplicate hours (DST fall-back)
     df = df[df.index.notna()].sort_index()
     df = df[~df.index.duplicated(keep="first")]
 
-    # Identify the price column (first numeric)
     numeric_cols = df.select_dtypes(include=np.number).columns.tolist()
     if not numeric_cols:
         st.error(f"No numeric price column found in `{PRICE_FILES[market_key]}`.")
@@ -107,6 +132,9 @@ def load_prices(market_key: str) -> pd.DataFrame:
     out["year"]  = out.index.year
     out["month"] = out.index.month
     out["hour"]  = out.index.hour
+
+    # Keep only the years this portfolio covers (2018–2024)
+    out = out[(out["year"] >= SCOPE_YEAR_MIN) & (out["year"] <= SCOPE_YEAR_MAX)]
     return out
 
 
@@ -115,35 +143,45 @@ def build_heatmap_matrix(df_year: pd.DataFrame) -> pd.DataFrame:
     For one year: return a 24 (hour) × 12 (month) matrix of the
     percentage of hours with negative price in each hour/month cell.
     """
-    # Count negative hours and total hours per (hour, month)
     grp = df_year.groupby(["hour", "month"])
-    neg = grp["price"].apply(lambda s: 100 * (s < 0).mean())  # % negative
-    mat = neg.unstack("month")  # rows = hour, cols = month
-
-    # Ensure full 24×12 grid even if some cells are empty
+    neg = grp["price"].apply(lambda s: 100 * (s < 0).mean())
+    mat = neg.unstack("month")
     mat = mat.reindex(index=range(24), columns=range(1, 13))
     return mat
 
 
 # ── Header ───────────────────────────────────────────────────────────────────
-st.title("🔴 Negative Price Heatmap")
+st.markdown('<div class="eyebrow">Independent Research · Tool 2 of 4</div>', unsafe_allow_html=True)
+st.title("Negative Price Heatmap")
+
 st.markdown("""
-<div class="concept-box">
-<strong>Why negative prices matter.</strong>
-Prices fall below <code>€0/MWh</code> when inflexible generation (renewables that can't
-easily switch off, plus must-run plants) exceeds demand. Producers literally pay to
-offload power. The pattern of <em>when</em> this happens — midday solar peaks in summer,
-windy nights — is exactly when a flexible industrial asset can get paid to consume.
-This heatmap maps that opportunity across the day and year.
+<div class="body-text">
+Sometimes electricity prices go below zero — generators effectively pay the grid to take
+their power. This happens when inflexible supply (renewables that can't easily switch off,
+plus baseload plants that are slow or costly to shut down) exceeds demand. This page maps
+exactly <em>when</em> that happens across the day and year — and those same windows are
+precisely when a flexible industrial asset (a battery, a factory that can shift load) can get
+paid to consume power instead of paying for it.
+</div>
+""", unsafe_allow_html=True)
+
+st.markdown("""
+<div class="info-box">
+<strong>How to read the grid.</strong><br>
+Each cell is one hour-of-day (rows, 00–23) × one month (columns, Jan–Dec). The color in each
+cell is <code>% of hours in that slot, across the whole year, where price fell below €0/MWh</code>.
+A dark cell means that hour/month combination almost never sees negative prices. A bright red
+cell means it happens often — usually midday hours in sunny months (solar oversupply) or
+overnight in windy months (wind oversupply with low demand).
 </div>
 """, unsafe_allow_html=True)
 
 # ── Sidebar controls ───────────────────────────────────────────────────────────
 with st.sidebar:
-    st.markdown("### 🗺️ Market")
+    st.markdown('<div class="section-label">Market</div>', unsafe_allow_html=True)
     market = st.selectbox("Select market", list(PRICE_FILES.keys()), index=0)
 
-    st.markdown("### 🖼️ View Mode")
+    st.markdown('<div class="section-label">View Mode</div>', unsafe_allow_html=True)
     view_mode = st.radio(
         "Comparison layout",
         ["Small multiples (all years)", "Single year"],
@@ -153,7 +191,7 @@ with st.sidebar:
 
     st.markdown("---")
     st.markdown("""
-    <div style='font-size:0.75rem; color:#8b949e; font-family: IBM Plex Mono, monospace;'>
+    <div style='font-size:0.78rem; color:#8f8c86; font-family: "IBM Plex Mono", monospace; line-height:1.8;'>
     Cell value = % of hours in that<br>
     hour-of-day & month with<br>
     price &lt; €0/MWh.<br><br>
@@ -165,13 +203,20 @@ with st.sidebar:
 df = load_prices(market)
 years = sorted(df["year"].unique())
 
+if not years:
+    st.error(
+        f"No data in the 2018–2024 range was found for {market}. "
+        "Check that the parquet file actually contains rows in this period."
+    )
+    st.stop()
+
 if view_mode == "Single year":
     with st.sidebar:
-        st.markdown("### 📅 Year")
+        st.markdown('<div class="section-label">Year</div>', unsafe_allow_html=True)
         sel_year = st.select_slider("Choose year", options=years, value=years[-1])
 
 # ── KPI strip ───────────────────────────────────────────────────────────────────
-st.markdown("---")
+st.markdown('<div class="section-label">Key Statistics</div>', unsafe_allow_html=True)
 total_neg_pct = 100 * (df["price"] < 0).mean()
 worst_year_series = df.groupby("year")["price"].apply(lambda s: 100 * (s < 0).mean())
 worst_year = worst_year_series.idxmax()
@@ -190,18 +235,30 @@ k4.metric(f"Change {earliest}→{latest}", f"{growth:+.2f} pp",
           help="Percentage-point change in share of negative hours")
 
 # ── Shared colour scale ─────────────────────────────────────────────────────────
-# Compute a common max across all years so colours are comparable
 all_mats = {yr: build_heatmap_matrix(df[df["year"] == yr]) for yr in years}
+
+# Flag years with essentially no data, instead of silently rendering a blank panel
+empty_years = [yr for yr, m in all_mats.items() if not m.notna().any().any()]
+if empty_years:
+    st.warning(
+        f"No price data found for: {', '.join(str(y) for y in empty_years)} in {market}. "
+        "These panels will render empty below — this reflects a gap in the underlying "
+        "parquet file for that year, not a charting issue."
+    )
+
 global_max = max((m.max().max() for m in all_mats.values() if m.notna().any().any()),
                  default=5.0)
-global_max = max(global_max, 1.0)  # avoid zero-range colour bar
+global_max = max(global_max, 1.0)
 
+# Dark charcoal → teal (mild) → amber (moderate) → red (severe): ties the
+# heatmap into the same palette as the rest of the site while keeping red
+# as the universally-understood "this is bad" signal at the high end.
 COLORSCALE = [
-    [0.0, "#0d1117"],   # background-matching dark for zero
-    [0.15, "#1c2b3a"],
-    [0.35, "#8a5a44"],
-    [0.6, "#d9534f"],
-    [1.0, "#ff4d4d"],   # bright red = frequent negative prices
+    [0.0, "#131314"],
+    [0.2, "#1c4b46"],
+    [0.45, "#2dd4bf"],
+    [0.7, "#f0a860"],
+    [1.0, "#e05c5c"],
 ]
 
 
@@ -218,19 +275,20 @@ def make_heatmap(mat: pd.DataFrame, title: str, showscale: bool = True) -> go.He
     )
 
 
-# ── Render ────────────────────────────────────────────────────────────────────
-st.markdown("---")
+PLOT_FONT = dict(family="'IBM Plex Mono', monospace", color="#8f8c86")
+PLOT_BG   = "#131314"
 
+# ── Render ────────────────────────────────────────────────────────────────────
 if view_mode == "Single year":
-    st.subheader(f"📅 {market} — {sel_year}")
+    st.markdown(f'<div class="section-label">{market} — {sel_year}</div>', unsafe_allow_html=True)
     st.caption("Brighter red = more frequent negative prices in that hour & month")
 
     mat = all_mats[sel_year]
     fig = go.Figure(make_heatmap(mat, str(sel_year), showscale=True))
     fig.update_layout(
         template="plotly_dark",
-        paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
-        font=dict(family="IBM Plex Mono, monospace", color="#8b949e"),
+        paper_bgcolor=PLOT_BG, plot_bgcolor=PLOT_BG,
+        font=PLOT_FONT,
         xaxis=dict(title="Month", side="bottom"),
         yaxis=dict(title="Hour of day", autorange="reversed"),
         margin=dict(l=60, r=20, t=20, b=50),
@@ -239,7 +297,7 @@ if view_mode == "Single year":
     st.plotly_chart(fig, use_container_width=True)
 
 else:  # Small multiples
-    st.subheader(f"🖼️ {market} — All years")
+    st.markdown(f'<div class="section-label">{market} — All Years</div>', unsafe_allow_html=True)
     st.caption("Shared colour scale across all panels, so intensity is directly comparable year-to-year")
 
     n = len(years)
@@ -255,7 +313,7 @@ else:  # Small multiples
     for i, yr in enumerate(years):
         r = i // cols + 1
         c = i % cols + 1
-        showscale = (i == 0)  # one shared colour bar
+        showscale = (i == 0)
         fig.add_trace(make_heatmap(all_mats[yr], str(yr), showscale=showscale), row=r, col=c)
         fig.update_yaxes(autorange="reversed", row=r, col=c,
                          tickvals=[0, 6, 12, 18], title_text="Hr" if c == 1 else None)
@@ -264,41 +322,47 @@ else:  # Small multiples
 
     fig.update_layout(
         template="plotly_dark",
-        paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
-        font=dict(family="IBM Plex Mono, monospace", color="#8b949e", size=10),
+        paper_bgcolor=PLOT_BG, plot_bgcolor=PLOT_BG,
+        font=dict(family="'IBM Plex Mono', monospace", color="#8f8c86", size=10),
         margin=dict(l=40, r=20, t=40, b=30),
         height=300 * rows,
     )
-    # Style the per-panel year titles
     for ann in fig["layout"]["annotations"]:
-        ann["font"] = dict(family="IBM Plex Mono, monospace", color="#58a6ff", size=13)
+        ann["font"] = dict(family="'IBM Plex Mono', monospace", color="#2dd4bf", size=13)
 
     st.plotly_chart(fig, use_container_width=True)
 
 # ── Yearly trend bar (context below heatmaps) ──────────────────────────────────
-st.markdown("---")
-st.subheader("📈 Annual Share of Negative-Price Hours")
+st.markdown('<div class="section-label">Annual Share of Negative-Price Hours</div>', unsafe_allow_html=True)
+st.markdown("""
+<div class="body-text" style="font-size:0.92rem;">
+One bar per year — the share of all hours that year with a negative price. A rising trend
+means oversupply is becoming more frequent, which directly strengthens the case for
+flexible assets that can consume during exactly those hours.
+</div>
+""", unsafe_allow_html=True)
+
 trend = worst_year_series.reset_index()
 trend.columns = ["year", "pct"]
 
 bar = go.Figure(go.Bar(
     x=trend["year"], y=trend["pct"],
-    marker_color="#ff6b6b", opacity=0.85,
+    marker_color="#e05c5c", opacity=0.85,
     hovertemplate="Year: %{x}<br>Negative: %{y:.2f}%<extra></extra>",
 ))
 bar.update_layout(
     template="plotly_dark",
-    paper_bgcolor="#0d1117", plot_bgcolor="#0d1117",
-    font=dict(family="IBM Plex Mono, monospace", color="#8b949e"),
-    xaxis=dict(title="Year", dtick=1, gridcolor="#21262d"),
-    yaxis=dict(title="% of hours negative", gridcolor="#21262d"),
+    paper_bgcolor=PLOT_BG, plot_bgcolor=PLOT_BG,
+    font=PLOT_FONT,
+    xaxis=dict(title="Year", dtick=1, gridcolor="#232324"),
+    yaxis=dict(title="% of hours negative", gridcolor="#232324"),
     margin=dict(l=60, r=20, t=20, b=50),
     height=320,
 )
 st.plotly_chart(bar, use_container_width=True)
 
 # ── Data table ──────────────────────────────────────────────────────────────────
-with st.expander("📋 Negative hours by month & year"):
+with st.expander("Negative hours by month & year"):
     pivot = df.assign(neg=df["price"] < 0).groupby(["year", "month"])["neg"].mean().mul(100)
     pivot = pivot.unstack("month").reindex(columns=range(1, 13))
     pivot.columns = MONTH_LABELS
@@ -307,12 +371,12 @@ with st.expander("📋 Negative hours by month & year"):
         use_container_width=True,
     )
     csv = pivot.to_csv().encode("utf-8")
-    st.download_button("⬇️ Download CSV", csv, f"negative_prices_{market}.csv", "text/csv")
+    st.download_button("Download CSV", csv, f"negative_prices_{market}.csv", "text/csv")
 
 # ── Footer ────────────────────────────────────────────────────────────────────
 st.markdown("---")
 st.markdown("""
-<div style='font-size:0.72rem; color:#484f58; font-family: IBM Plex Mono, monospace; text-align:center;'>
+<div style='font-size:0.75rem; color:#4a4a48; font-family: "IBM Plex Mono", monospace; text-align:center;'>
 Each cell = share of hours (in that hour-of-day & month) with day-ahead price below €0/MWh.
 Source: ENTSO-E Transparency Platform (2018–2024).
 </div>
