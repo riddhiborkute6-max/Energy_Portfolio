@@ -30,10 +30,10 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
 .hero { padding: 2.5rem 0 0.5rem 0; margin-bottom: 0.5rem; }
 .hero .eyebrow {
     font-family: 'IBM Plex Mono', monospace;
-    font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+    font-size: 15px; letter-spacing: 0.12em; text-transform: uppercase;
     color: #2dd4bf; margin-bottom: 0.6rem;
 }
-.hero h1 { font-size: 2.6rem !important; line-height: 1.15; margin: 0 0 0.9rem 0; }
+.hero h1 { font-size: 32px !important; line-height: 1.15; margin: 0 0 0.9rem 0; }
 
 /* Section labels + matching sub-headings (same pattern as the hero) */
 .section-label {
@@ -43,7 +43,7 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
 }
 .section-heading {
     font-family: 'Fraunces', serif !important; color: #f2f0eb !important;
-    font-weight: 600 !important; font-size: 1.9rem !important;
+    font-weight: 600 !important; font-size: 32px !important;
     margin: 0 0 1rem 0 !important;
 }
 
@@ -54,13 +54,6 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
 }
 .body-text strong { color: #f2f0eb; }
 .body-text .accent { color: #f0a860; font-weight: 600; }
-
-/* Tags */
-.tag {
-    display: inline-block; background: #17171a; border: 1px solid #2a2a2c;
-    border-radius: 20px; padding: 3px 12px; margin: 3px 6px 3px 0;
-    font-family: 'IBM Plex Mono', monospace; font-size: 0.72rem; color: #a7a49d;
-}
 
 /* Cards — the whole box is clickable */
 [data-testid="stPageLink"] {
@@ -79,7 +72,7 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
 }
 [data-testid="stPageLink"] p strong {
     font-family: 'Fraunces', serif !important; color: #f0a860 !important;
-    font-size: 1.15rem !important; font-weight: 600 !important;
+    font-size: 18px !important; font-weight: 600 !important;
     display: block; margin-bottom: 0.5rem;
 }
 
