@@ -73,12 +73,12 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
 }
 [data-testid="stPageLink"]:hover { border-color: #f0a860; transform: translateY(-2px); }
 [data-testid="stPageLink"] p {
-    font-family: 'Inter', sans-serif !important; color: #8f8c86 !important;
+    font-family: 'Inter', sans-serif !important; color: #2dd4bf !important;
     font-size: 0.9rem !important; line-height: 1.6 !important;
     text-align: left !important; white-space: pre-line !important;
 }
 [data-testid="stPageLink"] p strong {
-    font-family: 'Fraunces', serif !important; color: #2dd4bf !important;
+    font-family: 'Fraunces', serif !important; color: #8f8c86 !important;
     font-size: 1.15rem !important; font-weight: 600 !important;
     display: block; margin-bottom: 0.5rem;
 }
