@@ -37,7 +37,7 @@ h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !importan
 
 /* Section labels + matching sub-headings (same pattern as the hero) */
 .section-label {
-    font-family: 'IBM Plex Mono', monospace; font-size: 0.78rem;
+    font-family: 'IBM Plex Mono', monospace; font-size: 15px;
     letter-spacing: 0.12em; text-transform: uppercase; color: #2dd4bf;
     margin: 2.6rem 0 0.6rem 0;
 }
