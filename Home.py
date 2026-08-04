@@ -128,7 +128,7 @@ into client-facing decision tools.
 Before moving into energy, I spent two years as an engineer at John Deere in Pune, India,
 running Value Engineering workshops and building Power BI / Tableau reporting that standardised
 cost and performance tracking across plants in India, Europe and the US.
-<br><br>
+<br>
 </span>
 </div>
 """, unsafe_allow_html=True)
