@@ -27,7 +27,7 @@ html, body, [class*="css"] { font-family: 'Inter', sans-serif; }
 h1, h2, h3 { font-family: 'Fraunces', serif !important; color: #f2f0eb !important; font-weight: 600 !important; }
 
 /* Hero */
-.hero { padding: 2.5rem 0 1.5rem 0; border-bottom: 1px solid #232324; margin-bottom: 2rem; }
+.hero { padding: 2.5rem 0 0.5rem 0; margin-bottom: 0.5rem; }
 .hero .eyebrow {
     font-family: 'IBM Plex Mono', monospace;
     font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
@@ -117,12 +117,12 @@ st.markdown("""
 # ── About Me (background, from CV) ────────────────────────────────────────────
 st.markdown("""
 <div class="body-text">
-I'm an MSc Global Production Engineering student at TU Berlin (GPA 1.3), moving from a
+I'm an MSc Global Production Engineering student at TU Berlin, moving from a
 mechanical engineering background into quantitative energy-market analysis. I currently work
-as a <span class="accent">Working Student in Energy Storage and Flexibility Analytics at neustrom GmbH</span>
+as a <span class="accent">Working Student in Energy Market and Asset Analysis at neustrom GmbH</span>
 in Berlin, where I size and configure battery storage systems for industrial and commercial
 clients, build dispatch strategies for storage co-located with solar and wind, and develop
-Python-based market models on day-ahead price and generation data — translating that analysis
+Python-based market models on day-ahead price and generation data, translating that analysis
 into client-facing decision tools.
 <br><br>
 Before moving into energy, I spent two years as an engineer at John Deere in Pune, India,
@@ -138,18 +138,17 @@ st.markdown('<div class="section-label">The Research</div>', unsafe_allow_html=T
 st.markdown('<h2 class="section-heading">Quantifying the Cannibalization Effect</h2>', unsafe_allow_html=True)
 st.markdown("""
 <div class="body-text">
-As wind and solar grow, they depress electricity prices exactly when they generate most — the
+As wind and solar grow, they depress electricity prices exactly when they generate most —> the
 <span class="accent">cannibalization effect</span>. This erosion creates a widening price
 spread that flexible industrial assets, batteries and demand response, can capture. This
-portfolio turns seven years of ENTSO-E market data across Germany, the Netherlands and Denmark
-into interactive tools that measure exactly how much that flexibility is worth — independent
-research built ahead of my Master's thesis, starting August 2026.
+portfolio turns seven years (2018 to 2024) of ENTSO-E market data across Germany, the Netherlands and Denmark
+into interactive tools that measure exactly how much that flexibility is worth.
 </div>
 """, unsafe_allow_html=True)
 
 # ── Navigation cards ─────────────────────────────────────────────────────────
 st.markdown('<div class="section-label">Explore the Analysis</div>', unsafe_allow_html=True)
-st.markdown('<h2 class="section-heading">Four Ways Into the Data</h2>', unsafe_allow_html=True)
+st.markdown('<h2 class="section-heading">Completed Analysis Tools</h2>', unsafe_allow_html=True)
 
 # Real filenames confirmed from the repo. If any of these change, update the
 # path string (not the label) so the link keeps working.
@@ -171,11 +170,6 @@ cards = [
 cols = st.columns(4)
 for col, (title, desc, page_path) in zip(cols, cards):
     with col:
-        # NOTE: use_container_width and the forced "  \n" line break below are
-        # the two things to visually verify after deploying — I can't confirm
-        # they behave this way on your exact Streamlit version. If the
-        # description doesn't wrap onto its own line, tell me and I'll switch
-        # to a hover tooltip (help=) instead.
         try:
             st.page_link(
                 page_path,
